@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { parseEther } from "viem";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import BUYMECOFFEE_ABI from '@/abi/buymecoffee.json';
+import BUYMECOFFEE_ABI from "@/abi/buymecoffee.json";
 
 import {
   usePrepareContractWrite,
   useContractWrite,
   useAccount,
-  useWaitForTransaction
+  useWaitForTransaction,
 } from "wagmi";
 
 const Panel = () => {
@@ -25,22 +25,22 @@ const Panel = () => {
   //Current Account
   const { isConnected, address } = useAccount();
 
+  //making transaction
+  const [isPending, setIsPending] = useState(false);
+
   //---------------usePreparedWrite
   const { config } = usePrepareContractWrite({
     address: "0x25230a7fc0b534c0147Bb442A28100F6648dDe5b",
     abi: BUYMECOFFEE_ABI,
     functionName: "buyCoffee",
-    args: [
-        tipper.length > 0 ? tipper : address,
-        messg.length > 0 ? messg : "",
-      ],
+    args: [tipper.length > 0 ? tipper : address, messg.length > 0 ? messg : ""],
     value: parseEther(`${0.01 * amount}`),
   });
 
   // console.log("config---->", config)
 
   //------------------------------useContractWrite
-  const { data, write, error } = useContractWrite(config);
+  const { data, write, writeAsync } = useContractWrite(config);
 
   // console.log("write---->", write)
   // console.log("error---->", error)
@@ -53,10 +53,25 @@ const Panel = () => {
   //Handle with the transaction
   function handleSubmit(e) {
     //Check if the use has logged in.
-      e.preventDefault();
-      write?.();
-      setTipper('');
-      setMessg('');
+
+    e.preventDefault();
+    async function makeTx() {
+      setIsPending(true);
+      await writeAsync()
+        .then(() => {
+          setIsPending(false);
+
+          setTipper("");
+          setMessg("");
+        })
+        .catch(() => {
+          setIsPending(false);
+        });
+    }
+
+    makeTx();
+
+    // write?.();
 
     // e.preventDefault()
     // write?.({
@@ -158,7 +173,12 @@ const Panel = () => {
 
           <input
             type="text"
-            placeholder="Your name please(optional)"
+            placeholder={
+              isConnected
+                ? "Your name please(optional)"
+                : "Please connect your wallet first"
+            }
+            disabled={!isConnected || isPending || isLoading}
             onChange={(e) => setTipper(e.target.value)}
             value={tipper}
             className="mt-2 w-4/5 bg-[#F1F0F1] rounded-xl p-3 focus:outline-none focus:border-amber-900 border-2"
@@ -167,29 +187,47 @@ const Panel = () => {
             name="memo"
             cols="27"
             rows="10"
+            disabled={!isConnected || isPending || isLoading}
             value={messg}
             onChange={(e) => setMessg(e.target.value)}
             className="resize-none bg-[#F1F0F1] p-3 w-4/5 mt-3 focus:outline-none rounded-xl focus:border-amber-900 border-2"
-            placeholder="Say something nice...(optional)"
+            placeholder={
+              isConnected
+                ? "Say something nice...(optional)"
+                : "Please connect your wallet first"
+            }
           />
 
-          {isConnected ? 
+          {isConnected ? (
             <button
-            className="w-4/5 mt-5 rounded-3xl p-3 bg-[#6f4e37] text-white font-extrabold"
-            disabled={!write || isLoading}
-          >
-            {isLoading ? 'Processing...' : `Support ${0.01 * amount} ether`}
-          </button> :
+              className="w-4/5 mt-5 rounded-3xl p-3 bg-[#6f4e37] text-white font-extrabold"
+              disabled={!write || isLoading || isPending}
+            >
+              {isLoading
+                ? "Processing..."
+                : isPending
+                ? "Pending..."
+                : `Support ${0.01 * amount} ether`}
+            </button>
+          ) : (
             <div className="mt-3 flex flex-row items-center">
-                <ConnectButton /> <span className="ml-3 text-orange-400 font-extrabold">to support Eixoln</span>
+              <ConnectButton />{" "}
+              <span className="ml-3 text-orange-400 font-extrabold">
+                to support Eixoln
+              </span>
             </div>
-          }
+          )}
 
           {isSuccess && (
             <div className="mt-3 ml-1 text-gray-900 font-extrabold">
               Successfully supported Eixoln!!!❤
               <div className="flex justify-center">
-                <a className="underline" href={`https://sepolia.etherscan.io/tx/${data?.hash}`}>View on Sepolia</a>
+                <a
+                  className="underline"
+                  href={`https://sepolia.etherscan.io/tx/${data?.hash}`}
+                >
+                  View on Sepolia
+                </a>
               </div>
             </div>
           )}
