@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { parseEther } from "viem";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import BUYMECOFFEE_ABI from "@/abi/buymecoffee.json";
@@ -27,6 +27,20 @@ const Panel = () => {
 
   //making transaction
   const [isPending, setIsPending] = useState(false);
+
+  //before mounted
+  const [isCreate, setIsCreate] = useState(false);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setIsCreate(true);
+    }, 800);
+  
+    return () => {
+      clearTimeout(timeoutId)
+    }
+  }, [])
+  
 
   //---------------usePreparedWrite
   const { config } = usePrepareContractWrite({
@@ -88,7 +102,9 @@ const Panel = () => {
             Buy <strong className="text-[#6F4E37]">Eixoln</strong> a coffee ☕
           </div>
 
-          <div className="flex flex-row p-4 items-center mt-3">
+
+          {isCreate ? (
+            <><div className="flex flex-row p-4 items-center mt-3">
             <div className="text-4xl">☕</div>
             <div className="text-[rgba(0,0,0,.3)] text-[21px]">x</div>
 
@@ -197,7 +213,8 @@ const Panel = () => {
                 : "Please connect your wallet first"
             }
           />
-
+          
+          
           {isConnected ? (
             <button
               className="w-4/5 mt-5 rounded-3xl p-3 bg-[#6f4e37] text-white font-extrabold"
@@ -230,6 +247,9 @@ const Panel = () => {
                 </a>
               </div>
             </div>
+          )}</>
+          ) : (
+            <div>Loading panel...</div>
           )}
         </div>
       </form>
