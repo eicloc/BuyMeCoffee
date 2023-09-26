@@ -249,7 +249,7 @@ const Panel = () => {
             </div>
           )}</>
           ) : (
-            <div>Loading panel...</div>
+            <div className="flex h-[50vh] justify-center items-center">Loading panel...</div>
           )}
         </div>
       </form>

@@ -1,13 +1,13 @@
 "use client";
 
-import { useAccount, useContractEvent } from "wagmi";
+import { useContractEvent } from "wagmi";
 import BUYMECOFFEE_ABI from "@/abi/buymecoffee.json";
 import Image from "next/image";
 import { getContract } from "viem";
 import { createPublicClient, http } from "viem";
 import { sepolia } from "viem/chains";
 
-import { useState, useEffect, memo } from "react";
+import { useState, useEffect } from "react";
 
 const publicClient = createPublicClient({
   chain: sepolia,
@@ -25,7 +25,6 @@ const Memos = () => {
   const [curPage, setCurPage] = useState(1);
   const [memoLen, setMemoLen] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const {isConnected} = useAccount();
 
   //When the app is mounted, call useEffect------------
   useEffect(() => {
@@ -149,7 +148,7 @@ const Memos = () => {
 
       <div className="flex flex-col mt-3">
         {isLoading ? (
-          <div>Loading memos...</div>
+          <div className="flex h-[50vh] justify-center items-center">Loading memos...</div>
         ) : (
           memos.map((memo) => (
             <div
