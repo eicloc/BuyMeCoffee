@@ -15,13 +15,12 @@ const publicClient = createPublicClient({
 });
 
 const contract = getContract({
-  address: "0x25230a7fc0b534c0147Bb442A28100F6648dDe5b",
+  address: "0x0B2BDF2f1d478dae21F1bCd5e8B27f81093DEad7",
   abi: BUYMECOFFEE_ABI,
   publicClient,
 });
 
 const Memos = () => {
-  const [remoteMemos, setRemoteMemos] = useState([]);
   const [memos, setMemos] = useState([]);
   const [curPage, setCurPage] = useState(1);
   const [memoLen, setMemoLen] = useState(0);
@@ -33,16 +32,16 @@ const Memos = () => {
       const mmm = await contract.read.getMemos();
 
       console.log("全部memo如下：", mmm);
-      setRemoteMemos(mmm);
       setMemos(paginator(mmm));
       setIsLoading(false);
       localStorage.setItem("remoteMemos", JSON.stringify(mmm));
+      localStorage.setItem("curPage", 1);
     }
     fetchMemo();
 
-    return () => {
-      console.log("exit");
-    };
+    // return () => {
+    //   console.log("exit");
+    // };
   }, []);
 
   //paginator, divide the memos according to the current page index
@@ -75,25 +74,28 @@ const Memos = () => {
     //   setMemos(paginator(mmm, curP));
     //   setIsLoading(false);
     // }
+    const memos = JSON.parse(localStorage.getItem("remoteMemos"));
 
     if (next) {
       setIsLoading(true);
+      localStorage.setItem("curPage", curPage + 1);
       setCurPage(curPage + 1);
-      setMemos(paginator(remoteMemos, curPage + 1));
+      setMemos(paginator(memos, curPage + 1));
       setIsLoading(false);
       // refetchMemos(curPage + 1);
     } else {
       setIsLoading(true);
+      localStorage.setItem("curPage", curPage - 1);
       setCurPage(curPage - 1);
       // refetchMemos(curPage - 1);
-      setMemos(paginator(remoteMemos, curPage - 1));
+      setMemos(paginator(memos, curPage - 1));
       setIsLoading(false);
     }
   }
 
   //监听合约事件，并刷新留言组件
   useContractEvent({
-    address: "0x25230a7fc0b534c0147Bb442A28100F6648dDe5b",
+    address: "0x0B2BDF2f1d478dae21F1bCd5e8B27f81093DEad7",
     abi: BUYMECOFFEE_ABI,
     eventName: "NewMemo",
     async listener(log) {
@@ -102,11 +104,13 @@ const Memos = () => {
       console.log("New memo: ", log[0].args);
       const newMemo = log[0].args;
       const memos = JSON.parse(localStorage.getItem("remoteMemos"));
+      const curPage = localStorage.getItem("curPage");
       memos.push(newMemo);
+      localStorage.setItem("remoteMemos", JSON.stringify(memos));
       // const mmm = await contract.read.getMemos();
       console.log("new memos: ", memos);
-      setRemoteMemos(memos);
       setMemos(paginator(memos, curPage));
+      setCurPage(curPage);
       setIsLoading(false);
     },
   });

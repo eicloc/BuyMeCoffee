@@ -2,6 +2,8 @@
 pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/utils/Strings.sol";
 
+using Strings for uint256;
+
 contract BuyMeACoffee {
     // Event to emit when a Memo is created.
     event NewMemo(

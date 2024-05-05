@@ -43,7 +43,7 @@ const Panel = () => {
 
   //---------------usePreparedWrite
   const { config } = usePrepareContractWrite({
-    address: "0x25230a7fc0b534c0147Bb442A28100F6648dDe5b",
+    address: "0x0B2BDF2f1d478dae21F1bCd5e8B27f81093DEad7",
     abi: BUYMECOFFEE_ABI,
     functionName: "buyCoffee",
     args: [tipper.length > 0 ? tipper : address, messg.length > 0 ? messg : ""],

@@ -15,9 +15,9 @@
       },
       {
         "indexed": false,
-        "internalType": "uint256",
-        "name": "timestamp",
-        "type": "uint256"
+        "internalType": "string",
+        "name": "date",
+        "type": "string"
       },
       {
         "indexed": false,
@@ -65,9 +65,9 @@
             "type": "address"
           },
           {
-            "internalType": "uint256",
-            "name": "timestamp",
-            "type": "uint256"
+            "internalType": "string",
+            "name": "date",
+            "type": "string"
           },
           {
             "internalType": "string",
