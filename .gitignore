@@ -27,6 +27,7 @@ yarn-error.log*
 
 # local env files
 *.env
+/scripts
 
 # vercel
 .vercel
@@ -34,3 +35,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+coverage
+coverage.json
+typechain
+typechain-types
+
+# Hardhat files
+cache
+artifacts
+

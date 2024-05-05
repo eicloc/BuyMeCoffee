@@ -35,12 +35,11 @@ const Panel = () => {
     const timeoutId = setTimeout(() => {
       setIsCreate(true);
     }, 800);
-  
+
     return () => {
-      clearTimeout(timeoutId)
-    }
-  }, [])
-  
+      clearTimeout(timeoutId);
+    };
+  }, []);
 
   //---------------usePreparedWrite
   const { config } = usePrepareContractWrite({
@@ -102,154 +101,165 @@ const Panel = () => {
             Buy <strong className="text-[#6F4E37]">Eixoln</strong> a coffee ☕
           </div>
 
-
           {isCreate ? (
-            <><div className="flex flex-row p-4 items-center mt-3">
-            <div className="text-4xl">☕</div>
-            <div className="text-[rgba(0,0,0,.3)] text-[21px]">x</div>
+            <>
+              <div className="flex flex-row p-4 items-center mt-3">
+                <div className="text-4xl">☕</div>
+                <div className="text-[rgba(0,0,0,.3)] text-[21px]">x</div>
 
-            <div
-              className={`ml-3 w-10 h-10 relative text-center leading-10 ${
-                amount === 1 ? "bg-[#6F4E37] text-white" : "text-[#6F4E37]"
-              } hover:border-[#6F4E37]  rounded-full border border-[rgba(34,34,34,.3)]`}
-            >
-              <span className="text-[17px] font-extrabold ">1</span>
-              <input
-                checked={amount === 1}
-                onChange={() => {
-                  setAmount(1);
-                  setInputNum(1);
-                }}
-                className="absolute top-0 left-0 w-full h-full opacity-0"
-                type="radio"
-                value="0.01"
-              />
-            </div>
-
-            <div
-              className={`ml-3 w-10 h-10 relative text-center leading-10 ${
-                amount === 3 ? "bg-[#6f4e37] text-white" : "text-[#6f4e37]"
-              } hover:border-[#6f4e37]  rounded-full border border-[rgba(34,34,34,.3)]`}
-            >
-              <span className="text-[17px] font-extrabold">3</span>
-              <input
-                checked={amount === 3}
-                onChange={() => {
-                  setAmount(3);
-                  setInputNum(3);
-                }}
-                className="absolute top-0 left-0 w-full h-full opacity-0"
-                type="radio"
-                value="0.03"
-              />
-            </div>
-
-            <div
-              className={`ml-3 w-10 h-10 relative text-center leading-10 ${
-                amount === 5 ? "bg-[#6f4e37] text-white" : "text-[#6f4e37]"
-              } hover:border-[#6f4e37]  rounded-full border border-[rgba(34,34,34,.3)]`}
-            >
-              <span className="text-[17px] font-extrabold">5</span>
-              <input
-                checked={amount === 5}
-                onChange={() => {
-                  setAmount(5);
-                  setInputNum(5);
-                }}
-                className="absolute top-0 left-0 w-full h-full opacity-0"
-                type="radio"
-                value="0.05"
-              />
-            </div>
-
-            <input
-              className={`${
-                amount !== 1 && amount !== 3 && amount !== 5
-                  ? "outline-none border-[#6f4e37] border-2 text-[#6f4e37] font-extrabold"
-                  : ""
-              } w-10 ml-3 h-10 text-center border border-[rgba(34,34,34,.1.5)] focus:outline-none focus:border-2 focus:text-[#6f4e37] focus:font-extrabold focus:border-[#6f4e37]`}
-              name="coffees"
-              placeholder={amount}
-              value={inputNum}
-              onChange={(e) => {
-                const num = Number(e.target.value);
-                if (num === 0) {
-                  setInputNum(1);
-                  setAmount(1);
-                } else if (num > 100) {
-                  setInputNum(100);
-                  setAmount(100);
-                } else {
-                  setInputNum(num);
-                  setAmount(num);
-                }
-              }}
-            />
-          </div>
-
-          <input
-            type="text"
-            placeholder={
-              isConnected
-                ? "Your name please(optional)"
-                : "Please connect your wallet first"
-            }
-            disabled={!isConnected || isPending || isLoading}
-            onChange={(e) => setTipper(e.target.value)}
-            value={tipper}
-            className="mt-2 w-4/5 bg-[#F1F0F1] rounded-xl p-3 focus:outline-none focus:border-amber-900 border-2"
-          />
-          <textarea
-            name="memo"
-            cols="27"
-            rows="10"
-            disabled={!isConnected || isPending || isLoading}
-            value={messg}
-            onChange={(e) => setMessg(e.target.value)}
-            className="resize-none bg-[#F1F0F1] p-3 w-4/5 mt-3 focus:outline-none rounded-xl focus:border-amber-900 border-2"
-            placeholder={
-              isConnected
-                ? "Say something nice...(optional)"
-                : "Please connect your wallet first"
-            }
-          />
-          
-          
-          {isConnected ? (
-            <button
-              className="w-4/5 mt-5 rounded-3xl p-3 bg-[#6f4e37] text-white font-extrabold"
-              disabled={!write || isLoading || isPending}
-            >
-              {isLoading
-                ? "Processing..."
-                : isPending
-                ? "Pending..."
-                : `Support ${0.01 * amount} ether`}
-            </button>
-          ) : (
-            <div className="mt-3 flex flex-row items-center">
-              <ConnectButton />{" "}
-              <span className="ml-3 text-orange-400 font-extrabold">
-                to support Eixoln
-              </span>
-            </div>
-          )}
-
-          {isSuccess && (
-            <div className="mt-3 ml-1 text-gray-900 font-extrabold">
-              Successfully supported Eixoln!!!❤
-              <div className="flex justify-center">
-                <a
-                  className="underline"
-                  href={`https://sepolia.etherscan.io/tx/${data?.hash}`}
+                <div
+                  className={`ml-3 w-10 h-10 relative text-center leading-10 ${
+                    amount === 1 ? "bg-[#6F4E37] text-white" : "text-[#6F4E37]"
+                  } hover:border-[#6F4E37]  rounded-full border border-[rgba(34,34,34,.3)]`}
                 >
-                  View on Sepolia
-                </a>
+                  <span className="text-[17px] font-extrabold ">1</span>
+                  <input
+                    checked={amount === 1}
+                    onChange={() => {
+                      setAmount(1);
+                      setInputNum(1);
+                    }}
+                    className="absolute top-0 left-0 w-full h-full opacity-0"
+                    type="radio"
+                    value="0.01"
+                  />
+                </div>
+
+                <div
+                  className={`ml-3 w-10 h-10 relative text-center leading-10 ${
+                    amount === 3 ? "bg-[#6f4e37] text-white" : "text-[#6f4e37]"
+                  } hover:border-[#6f4e37]  rounded-full border border-[rgba(34,34,34,.3)]`}
+                >
+                  <span className="text-[17px] font-extrabold">3</span>
+                  <input
+                    checked={amount === 3}
+                    onChange={() => {
+                      setAmount(3);
+                      setInputNum(3);
+                    }}
+                    className="absolute top-0 left-0 w-full h-full opacity-0"
+                    type="radio"
+                    value="0.03"
+                  />
+                </div>
+
+                <div
+                  className={`ml-3 w-10 h-10 relative text-center leading-10 ${
+                    amount === 5 ? "bg-[#6f4e37] text-white" : "text-[#6f4e37]"
+                  } hover:border-[#6f4e37]  rounded-full border border-[rgba(34,34,34,.3)]`}
+                >
+                  <span className="text-[17px] font-extrabold">5</span>
+                  <input
+                    checked={amount === 5}
+                    onChange={() => {
+                      setAmount(5);
+                      setInputNum(5);
+                    }}
+                    className="absolute top-0 left-0 w-full h-full opacity-0"
+                    type="radio"
+                    value="0.05"
+                  />
+                </div>
+
+                <input
+                  className={`${
+                    amount !== 1 && amount !== 3 && amount !== 5
+                      ? "outline-none border-[#6f4e37] border-2 text-[#6f4e37] font-extrabold"
+                      : ""
+                  } w-10 ml-3 h-10 text-center border border-[rgba(34,34,34,.1.5)] focus:outline-none focus:border-2 focus:text-[#6f4e37] focus:font-extrabold focus:border-[#6f4e37]`}
+                  name="coffees"
+                  placeholder={amount}
+                  value={inputNum}
+                  type="number"
+                  onBlur={(e) => {
+                    const num = Number(e.target.value);
+                    if (num <= 0) {
+                      setInputNum(1);
+                      setAmount(1);
+                    }
+                  }}
+                  onChange={(e) => {
+                    const num = Number(e.target.value);
+                    if (num > 100) {
+                      setInputNum(100);
+                      setAmount(100);
+                    } else {
+                      setInputNum(Number(num));
+                      setAmount(Number(num));
+                    }
+                  }}
+                />
               </div>
-            </div>
-          )}</>
+
+              <input
+                type="text"
+                placeholder={
+                  isConnected
+                    ? "Your name(optional)"
+                    : "Please connect your wallet first"
+                }
+                disabled={!isConnected || isPending || isLoading}
+                onChange={(e) => setTipper(e.target.value)}
+                value={tipper}
+                className="mt-2 w-4/5 bg-[#F1F0F1] rounded-xl p-3 focus:outline-none focus:border-amber-900 border-2"
+              />
+              <textarea
+                name="memo"
+                cols="27"
+                rows="10"
+                disabled={!isConnected || isPending || isLoading}
+                value={messg}
+                onChange={(e) => setMessg(e.target.value)}
+                className="resize-none bg-[#F1F0F1] p-3 w-4/5 mt-3 focus:outline-none rounded-xl focus:border-amber-900 border-2"
+                placeholder={
+                  isConnected
+                    ? "Say something nice...(optional)"
+                    : "Please connect your wallet first"
+                }
+              />
+
+              {isConnected ? (
+                <button
+                  className={`w-4/5 mt-5 rounded-3xl p-3 ${
+                    !write || isLoading || isPending
+                      ? "bg-[#706b68]"
+                      : "bg-[#6f4e37]"
+                  }  text-white font-extrabold`}
+                  disabled={!write || isLoading || isPending}
+                >
+                  {isLoading
+                    ? "Processing..."
+                    : isPending
+                    ? "Pending..."
+                    : `Support ${0.01 * amount} ether`}
+                </button>
+              ) : (
+                <div className="mt-3 flex flex-row items-center">
+                  <ConnectButton />{" "}
+                  <span className="ml-3 text-orange-400 font-extrabold">
+                    to support Eixoln
+                  </span>
+                </div>
+              )}
+
+              {isSuccess && (
+                <div className="mt-3 ml-1 text-gray-900 font-extrabold">
+                  Successfully supported Eixoln!!!❤
+                  <div className="flex justify-center">
+                    <a
+                      className="underline"
+                      href={`https://sepolia.etherscan.io/tx/${data?.hash}`}
+                    >
+                      View on Sepolia
+                    </a>
+                  </div>
+                </div>
+              )}
+            </>
           ) : (
-            <div className="flex h-[50vh] justify-center items-center">Loading panel...</div>
+            <div className="flex h-[50vh] justify-center items-center">
+              Loading panel...
+            </div>
           )}
         </div>
       </form>

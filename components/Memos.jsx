@@ -7,7 +7,7 @@ import { getContract } from "viem";
 import { createPublicClient, http } from "viem";
 import { sepolia } from "viem/chains";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 
 const publicClient = createPublicClient({
   chain: sepolia,
@@ -21,6 +21,7 @@ const contract = getContract({
 });
 
 const Memos = () => {
+  const [remoteMemos, setRemoteMemos] = useState([]);
   const [memos, setMemos] = useState([]);
   const [curPage, setCurPage] = useState(1);
   const [memoLen, setMemoLen] = useState(0);
@@ -31,10 +32,11 @@ const Memos = () => {
     async function fetchMemo() {
       const mmm = await contract.read.getMemos();
 
-      console.log("全部memo如下：", mmm)
-
+      console.log("全部memo如下：", mmm);
+      setRemoteMemos(mmm);
       setMemos(paginator(mmm));
       setIsLoading(false);
+      localStorage.setItem("remoteMemos", JSON.stringify(mmm));
     }
     fetchMemo();
 
@@ -43,41 +45,49 @@ const Memos = () => {
     };
   }, []);
 
-  //分页器，根据当前页数来切割留言
+  //paginator, divide the memos according to the current page index
   function paginator(memos, curP = curPage) {
     // console.log("--------memos", memos)
-    // console.log("能不能在useEffect期间获取到状态变量", curPage);
     const len = memos.length;
-    setMemoLen(Math.floor(len/5) + (len%5 > 0 ? 1 : len%5));
+    setMemoLen(Math.floor(len / 5) + (len % 5 > 0 ? 1 : len % 5));
     // console.log("长度", len)
     const arr = [];
-    console.log("当前页面为：", curP)
+    console.log("当前页面为：", curP);
     const startIdx = len - 1 - (curP - 1) * 5;
     for (let i = startIdx; i > startIdx - 5 && i >= 0; i--) {
-      console.log("下标为：", i)
+      console.log("下标为：", i);
+      console.log("memos", memos);
       arr.push(memos[i]);
     }
+
+    console.log("arr-----", arr);
 
     return arr;
   }
 
   //翻页函数
   function turnPage(next) {
+    console.log("当前页面:", curPage);
     //重新获取memos列表，考虑到多人使用时，其他人可能更新了memos
-    async function refetchMemos(curP) {
-      const mmm = await contract.read.getMemos();
-      setMemos(paginator(mmm, curP));
-      setIsLoading(false);
-    }
+    // async function refetchMemos(curP) {
+    //   console.log("----现在", curP);
+    //   const mmm = await contract.read.getMemos();
+    //   setMemos(paginator(mmm, curP));
+    //   setIsLoading(false);
+    // }
 
     if (next) {
       setIsLoading(true);
       setCurPage(curPage + 1);
-      refetchMemos(curPage + 1);
+      setMemos(paginator(remoteMemos, curPage + 1));
+      setIsLoading(false);
+      // refetchMemos(curPage + 1);
     } else {
       setIsLoading(true);
       setCurPage(curPage - 1);
-      refetchMemos(curPage - 1);
+      // refetchMemos(curPage - 1);
+      setMemos(paginator(remoteMemos, curPage - 1));
+      setIsLoading(false);
     }
   }
 
@@ -89,10 +99,14 @@ const Memos = () => {
     async listener(log) {
       setIsLoading(true);
       console.log("--------");
-      console.log("New memo: ", log);
-      const mmm = await contract.read.getMemos();
-      console.log("memos: ", mmm);
-      setMemos(paginator(mmm));
+      console.log("New memo: ", log[0].args);
+      const newMemo = log[0].args;
+      const memos = JSON.parse(localStorage.getItem("remoteMemos"));
+      memos.push(newMemo);
+      // const mmm = await contract.read.getMemos();
+      console.log("new memos: ", memos);
+      setRemoteMemos(memos);
+      setMemos(paginator(memos, curPage));
       setIsLoading(false);
     },
   });
@@ -120,7 +134,7 @@ const Memos = () => {
   }
 
   return (
-    <div className="h-full rounded-lg w-2/6 flex flex-col p-6 border border-[rgba(34,34,34,.1)] bg-white">
+    <div className="h-full rounded-lg w-2/6 flex flex-col p-6 border border-[rgba(34,34,34,.1)] bg-white box-border ">
       <div className="flex justify-between">
         <div className="text-lg font-extrabold">Memos received</div>
         {!isLoading && (
@@ -128,9 +142,14 @@ const Memos = () => {
             <button
               className="h-8 w-8 hover:bg-[#F1F0F1] rounded-full flex items-center justify-center mr-2 disabled:bg-transparent"
               onClick={() => turnPage(false)}
-              disabled={curPage===1}
+              disabled={curPage === 1}
             >
-              <Image alt="prev" src={curPage === 1 ? "/prev0.png" : "/prev1.png"} width={25} height={25} />
+              <Image
+                alt="prev"
+                src={curPage === 1 ? "/prev0.png" : "/prev1.png"}
+                width={25}
+                height={25}
+              />
             </button>
             <div className="mr-1 text-4xl">{curPage}</div>
             <div className="mr-1">/</div>
@@ -138,9 +157,14 @@ const Memos = () => {
             <button
               className="h-8 w-8 hover:bg-[#F1F0F1] rounded-full flex items-center justify-center disabled:bg-transparent"
               onClick={() => turnPage(true)}
-              disabled={curPage===memoLen}
+              disabled={curPage === memoLen}
             >
-              <Image alt="next" src={curPage === 3 ? "/next0.png" : "/next1.png"} width={25} height={25} />
+              <Image
+                alt="next"
+                src={curPage === memoLen ? "/next0.png" : "/next1.png"}
+                width={25}
+                height={25}
+              />
             </button>
           </div>
         )}
@@ -148,7 +172,9 @@ const Memos = () => {
 
       <div className="flex flex-col mt-3">
         {isLoading ? (
-          <div className="flex h-[50vh] justify-center items-center">Loading memos...</div>
+          <div className="flex h-[50vh] justify-center items-center">
+            Loading memos...
+          </div>
         ) : (
           memos.map((memo) => (
             <div
